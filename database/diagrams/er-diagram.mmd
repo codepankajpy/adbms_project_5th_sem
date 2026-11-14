@@ -1,0 +1,222 @@
+erDiagram
+    users ||--o| customers : "has profile"
+    users ||--o| mechanics : "has profile"
+    users ||--o{ audit_logs : "triggers"
+    users ||--o{ service_status_history : "records"
+
+    customers ||--o{ vehicles : "owns"
+    customers ||--o{ service_bookings : "books"
+    customers ||--o{ invoices : "billed to"
+    customers ||--o{ reviews : "writes"
+
+    vehicle_brands ||--o{ vehicle_models : "manufactures"
+    vehicle_models ||--o{ vehicles : "defines model"
+
+    vehicles ||--o{ service_bookings : "serviced in"
+    vehicles ||--o{ service_records : "service history"
+
+    service_categories ||--o{ services : "categorizes"
+
+    service_bookings ||--o{ booking_services : "contains"
+    services ||--o{ booking_services : "included in"
+
+    service_bookings ||--o{ service_assignments : "assigned to"
+    mechanics ||--o{ service_assignments : "performs"
+
+    service_bookings ||--o| service_records : "produces"
+    mechanics ||--o{ service_records : "executes"
+
+    service_bookings ||--o| invoices : "billed via"
+    invoices ||--o{ invoice_items : "itemized with"
+    services ||--o{ invoice_items : "referenced in"
+
+    invoices ||--o{ payments : "settled through"
+
+    service_bookings ||--o{ service_status_history : "state transitions"
+    service_bookings ||--o| reviews : "reviewed in"
+
+    users {
+        int id PK
+        string email UK
+        string password_hash
+        user_role role
+        string full_name
+        string phone
+        boolean is_active
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    customers {
+        int id PK
+        int user_id FK,UK
+        text address
+        string city
+        string state
+        string postal_code
+        string emergency_contact
+    }
+
+    mechanics {
+        int id PK
+        int user_id FK,UK
+        string specialization
+        int experience_years
+        numeric hourly_rate
+        string status
+        boolean is_available
+    }
+
+    vehicle_brands {
+        int id PK
+        string name UK
+        string country
+    }
+
+    vehicle_models {
+        int id PK
+        int brand_id FK
+        string model_name
+        string body_type
+        fuel_type fuel_type
+    }
+
+    vehicles {
+        int id PK
+        int customer_id FK
+        int model_id FK
+        string registration_number UK
+        string vin UK
+        int year
+        string color
+        int mileage_km
+        transmission_type transmission
+    }
+
+    service_categories {
+        int id PK
+        string name UK
+        text description
+        string icon
+    }
+
+    services {
+        int id PK
+        int category_id FK
+        string name
+        text description
+        numeric base_price
+        int estimated_duration_minutes
+        boolean is_active
+    }
+
+    service_bookings {
+        int id PK
+        string booking_number UK
+        int customer_id FK
+        int vehicle_id FK
+        date booking_date
+        string time_slot
+        booking_status status
+        text customer_notes
+        numeric total_estimated_cost
+    }
+
+    booking_services {
+        int booking_id PK,FK
+        int service_id PK,FK
+        numeric unit_price
+        text notes
+    }
+
+    service_assignments {
+        int id PK
+        int booking_id FK
+        int mechanic_id FK
+        timestamptz assigned_at
+        timestamptz started_at
+        timestamptz completed_at
+        assignment_status status
+        text mechanic_notes
+    }
+
+    service_records {
+        int id PK
+        int booking_id FK,UK
+        int vehicle_id FK
+        int mechanic_id FK
+        timestamptz completed_date
+        text work_performed
+        text parts_replaced
+        text diagnostic_notes
+        int odometer_reading
+    }
+
+    invoices {
+        int id PK
+        string invoice_number UK
+        int booking_id FK,UK
+        int customer_id FK
+        numeric subtotal
+        numeric tax_rate
+        numeric tax_amount
+        numeric discount_amount
+        numeric total_amount
+        invoice_status status
+        date due_date
+        timestamptz issued_at
+    }
+
+    invoice_items {
+        int id PK
+        int invoice_id FK
+        int service_id FK
+        string description
+        int quantity
+        numeric unit_price
+        numeric line_total
+    }
+
+    payments {
+        int id PK
+        string payment_reference UK
+        int invoice_id FK
+        numeric amount
+        payment_method payment_method
+        payment_status status
+        string transaction_id
+        timestamptz payment_date
+        text remarks
+    }
+
+    service_status_history {
+        int id PK
+        int booking_id FK
+        booking_status previous_status
+        booking_status new_status
+        int changed_by_user_id FK
+        text change_reason
+        timestamptz changed_at
+    }
+
+    reviews {
+        int id PK
+        int booking_id FK,UK
+        int customer_id FK
+        int rating
+        text comment
+        timestamptz review_date
+    }
+
+    audit_logs {
+        int id PK
+        string table_name
+        int record_id
+        string action
+        int changed_by_user_id FK
+        jsonb old_data
+        jsonb new_data
+        string ip_address
+        timestamptz created_at
+    }
+
