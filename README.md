@@ -5,6 +5,14 @@
 
 ---
 
+## Contributors
+- Pankaj – 24BCS12303
+- Pankaj Suthar – 24BCS12551
+- Harsh Raj– 24BCS12444
+
+### Section - 24BCS-KRG-617A
+---
+
 ## 1. Project Overview
 
 The **Vehicle Service Management System** is an enterprise-grade automobile workshop platform engineered to demonstrate advanced relational database engineering, PL/pgSQL procedural programming, query optimization, and strict ACID transaction management.
